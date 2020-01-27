@@ -63,10 +63,12 @@ public class BallSpawnerController : MonoBehaviour
 			var arch = 0.5f;
 
 			var closeness = Math.Min(10f, dist) / 10f;
-			
-			float force = GetForceFromTensorFlow(dist);
 
-			var ball = Instantiate(PrefabBall, transform.position, Quaternion.identity);
+            float force;
+            force = GetForceRandomly(dist);
+//            force = GetForceFromTensorFlow(dist);
+
+            var ball = Instantiate(PrefabBall, transform.position, Quaternion.identity);
 			var bc = ball.GetComponent<BallController>();
 			bc.Force = new Vector3(
 				dir.x * arch * closeness,
@@ -76,7 +78,7 @@ public class BallSpawnerController : MonoBehaviour
 			bc.Distance = dist;
 			
 			yield return new WaitForSeconds(0.02f);
-			// MoveToRandomDistance();
+			 MoveToRandomDistance();
 		}
 	}
 
