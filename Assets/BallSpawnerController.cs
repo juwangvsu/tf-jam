@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using TensorFlow;
+using System.Runtime.InteropServices;
 
 [System.Serializable]
 class Prediction
@@ -15,7 +16,12 @@ class Prediction
 
 public class BallSpawnerController : MonoBehaviour
 {
-	public Transform TransformGoal;
+//#if UNITY_EDITOR_WINDOWS || UNITY_STANDALONE_WINDOWS
+    private const string LIBRARY_NAME = "randomnumber";
+//#endif
+    [DllImport(LIBRARY_NAME)]
+    private static extern int GetRandom();
+    public Transform TransformGoal;
 	public Transform TransformAim;
 	public GameObject PrefabBall;
 
@@ -28,8 +34,9 @@ public class BallSpawnerController : MonoBehaviour
 	private TFSession session;
 	
 	void Start ()
-	{	
-		File.WriteAllText("successful_shots.csv", "");
+	{
+        Debug.Log("test random" + GetRandom());
+        File.WriteAllText("successful_shots.csv", "");
 		TextAsset graphModel = Resources.Load ("frozen.pb") as TextAsset;
 		graph = new TFGraph ();
 		graph.Import (graphModel.bytes);
