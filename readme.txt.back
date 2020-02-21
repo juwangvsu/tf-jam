@@ -1,0 +1,66 @@
+Video:
+tensorflowjs frozen graph keras tf-jam.mp4
+
+-------------- 2/19/2020 docker image to generate frozen2.pb.bytes--------------------
+cd tsjs;
+docker run --gpus all -it -p "3000:6006" -v "${PWD}:/app" jwang3vsu/tensorflow:tf2-keras-nodejs-tfjs bash
+	inside docker image:
+		cd /app
+		source ~/.profile
+		./build.sh
+		
+-------------- 2/19/2020 working setup to generate frozen2.pb.bytes--------------------
+Msi, sda18, 
+    (sample-env) student@student-Q302LA:~/unityproj/tf-jam/tsjs$ 
+    npm install (if node_modules not exist
+    ./build.sh
+        This is a mixed setup, (1) tensorflowjs_converter is from tf 2.0, (2)
+        Import_pb_to_tensorboard.py is from tf1.14
+
+node index.js
+	Generate model_as_tsjs/model.json, weights.bin
+bash tsjs_to_keras.sh
+	Generate model_as_keras/model.h5
+python3 keras_to_pb.py
+	Generate frozen2.pb.bytes, model/tf_model.pb, model_as_pb/model.pb
+cp frozen2.pb.bytes ../Assets/Resources/frozen2.pb.bytes
+python3 /usr/local/lib/python3.5/dist-packages/tensorflow/python/tools/import_pb_to_tensorboard.py  --model_dir ./frozen2.pb.bytes --log_dir log3
+	visualize the frozen file to a tensorboard folder
+
+---------------------------2/19/2020 import_pb_to_tensorboard---------------------------
+/usr/local/lib/python3.5/dist-packages/tensorflow/python/tools/import_pb_to_tensorboard.py
+
+keras_ex3$ python keras_tensorboard.py 
+	Train and generate keras_ex2_model.h5
+keras_ex3$ python keras_to_pb.py
+	Convert keras_ex2_model.h5 to 
+Frozen2.pb.bytes
+	with tf.gfile.GFile("frozen2.pb.bytes", "wb") as f:
+        		f.write(frozen_graph.SerializeToString()
+	Acceptable by (3)
+model/tf_model.pb
+	tf.train.write_graph((frozen_graph, "model", "tf_model.pb", as_text=False)
+	Acceptable by (3)
+model_as_pb/model.pb
+	tf.train.write_graph(sess.graph_def, "./model_as_pb", "model.pb", as_text=False)
+.Acceptable by (3), but if as_text=true then not accepatabe in (3)
+python3 /usr/local/lib/python3.5/dist-packages/tensorflow/python/tools/import_pb_to_tensorboard.py  --model_dir model/tf_model.pb --log_dir log3
+		Extract info from pb file for tensorboard to visualize
+
+
+
+---------------------keras model examine in tensorboard -------------------------------------
+/media/student/voc2012/unityproj/keras_ex3	
+Keras_tensorboard.py train keras model a linear function, it save tensorboard information at logs. 
+
+-------2/18/2020 saved_model tensorflow and visulize in tensorboard  ---------------------
+(1): train and generate saved_model.pb
+(sample-env) student@student-Q302LA:/media/student/voc2012/unityproj/mnist_saved_model$ python mnist_saved_model.py logs
+
+(2) convert saved_model.pb to a tensorboard folder
+(sample-env) student@student-Q302LA:/media/student/voc2012/unityproj/keras_ex3$ python import_pb_to_tensorboard.py --model_dir ../mnist_saved_model/logs/1/ --log_dir log2
+
+(3) view tensorboard.
+(sample-env) student@student-Q302LA:/media/student/voc2012/unityproj/keras_ex3$ tensorboard --logdir=log2
+
+
