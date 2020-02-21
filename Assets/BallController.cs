@@ -52,7 +52,8 @@ public class BallController : MonoBehaviour
 			if (hasTriggeredTop  && !hasBeenScored)
 			{
 				GetComponent<Renderer>().material = MaterialBallScored;
-				DoReport(String.Format("{0}, {1}, {2}", SuccessCount++, Distance, Force.y));
+                if (SuccessCount<100)
+				    DoReport(String.Format("{0}, {1}, {2}", SuccessCount++, Distance, Force.y));
 			}
 			hasBeenScored = true;
 		}
@@ -61,7 +62,8 @@ public class BallController : MonoBehaviour
 	void DoReport(string info)
 	{
 		Debug.Log(info);
-		File.AppendAllText("successful_shots.csv", info += "\n");
+		File.AppendAllText("successful_shots.csv", info += "test\n");
+        Debug.Log("got one");
 	}
 
 	IEnumerator DoReport()

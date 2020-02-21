@@ -6,6 +6,9 @@
 [Bb]uilds/
 Assets/AssetStoreTools*
 
+#npm local packages, 300M, install by "node install"
+tsjs/node_modules/
+
 # Visual Studio cache directory
 .vs/
 

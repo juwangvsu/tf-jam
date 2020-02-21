@@ -1,14 +1,42 @@
 #!/usr/bin/env python3
-from keras.models import load_model
-import tensorflow as tf
-import sys
+# 2/15/2020: keras and tensorflow.keras version not same could cause problem in .h5 format
+#	keras is 2.3.1, tensorflow.keras is 2.2.4 msi sda18
+# convert a h5 to pb format and a frozen format, result is in frozen2.pb.bytes, model_as_pb , model_as_checkpoint
 
+from tensorflow.keras.models import load_model
+#	this is 2.2.4
+#  	print(tensorflow.keras.__version__)
+#from keras.models import load_model
+#	this is 2.3.1
+#  	print(keras.__version__)
+
+import tensorflow as tf
+if tf.__version__.find("1")==0:
+   print("version 1 found ")
+else:
+   import tensorflow.compat.v1 as tf
+   tf.disable_v2_behavior()
+   print("version 2 found ")
+print("version set to found " + tf.__version__)
+
+import sys
+#sess = tf.compat.v1.Session()
 sess = tf.Session()
 
-from keras import backend as K
-K.set_session(sess)
+from tensorflow.keras import backend as K
+tf.compat.v1.keras.backend.set_session(sess)
+#K.set_session(sess)
+
+model_id=2
+#model_id=1 keras_ex3, keras_ex2_model.h5, generated from keras_tensorboard.py
+#	 =2 tsjs, model_as_keras/model.h5, generated from index.js
+#model = load_model('keras_ex2_model.h5')
 model = load_model('model_as_keras/model.h5')
 
+#model = load_model('baseball_model.h5')
+print(model.outputs)
+print(model.inputs)
+model.summary()
 def freeze_session(session, keep_var_names=None, output_names=None, clear_devices=True):
     """
     Freezes the state of a session into a pruned computation graph.
@@ -37,13 +65,28 @@ def freeze_session(session, keep_var_names=None, output_names=None, clear_device
         frozen_graph = convert_variables_to_constants(session, input_graph_def,
                                                       output_names, freeze_var_names)
         return frozen_graph
+if model_id==1:
+   inp = sess.graph.get_tensor_by_name('layer1_input:0')
+else:
+   inp = sess.graph.get_tensor_by_name('hidden_input:0')
 
+print(inp)
+frozen_graph = freeze_session(sess, output_names=[out.op.name for out in model.outputs])
 
+# this is acceptable to import_pb_to_tensorboard.py
+with tf.gfile.GFile("frozen2.pb.bytes", "wb") as f:
+        f.write(frozen_graph.SerializeToString())
+
+#this is the same as frozen2.pb.bytes
+tf.train.write_graph(frozen_graph, "model", "tf_model.pb", as_text=False)
+print("%d ops in the final graph." % len(frozen_graph.node))
+
+#tf.saved_model.simple_save(sess, "model_as_checkpoint/Profile.ckpt")
 tSaver = tf.train.Saver()
 tSaver.save(sess, "model_as_checkpoint/Profile.ckpt")
 
 print([n.name for n in tf.get_default_graph().as_graph_def().node])
 print(model.summary())
 
-#frozen_graph = freeze_session(sess)
-tf.train.write_graph(sess.graph_def, "./model_as_pb", "model.pb", as_text=True)
+#this only has the graph definition in text format, not acceptable to import_pb_to_tensorboard.py
+tf.train.write_graph(sess.graph_def, "./model_as_pb", "model.pb", as_text=False)

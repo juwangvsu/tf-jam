@@ -17,7 +17,9 @@ require('@tensorflow/tfjs-node');
         Train the model using the data.
      */
     var model = tf.sequential();
-    model.add(tf.layers.dense({units: 1, inputShape: [1], name: "shots"}));
+    model.add(tf.layers.dense({units: 3,activation: 'relu', inputShape: [1], name: "hidden"}));
+    model.add(tf.layers.dense({units: 3,activation: 'relu', inputShape: [1], name: "hidden2layer"}));
+    model.add(tf.layers.dense({units: 1, name: "shots"}));
     model.compile({loss: 'meanSquaredError', optimizer: 'sgd'});
 
     console.log(pairs);
@@ -35,7 +37,7 @@ require('@tensorflow/tfjs-node');
 })();
 
 function getPairsFromCSV() {
-    return fs.readFileSync("../successful_shots.csv").toString().split("\n").map((row) => {
+    return fs.readFileSync("successful_shots.csv").toString().split("\n").map((row) => {
         const pair = row.split(",").slice(1).map((field) => {
             return parseFloat(field);
         });

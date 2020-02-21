@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 using TensorFlow;
-using System.Runtime.InteropServices;
 
 [System.Serializable]
 class Prediction
@@ -16,29 +15,29 @@ class Prediction
 
 public class BallSpawnerController : MonoBehaviour
 {
-//#if UNITY_EDITOR_WINDOWS || UNITY_STANDALONE_WINDOWS
-    private const string LIBRARY_NAME = "randomnumber";
-//#endif
-    [DllImport(LIBRARY_NAME)]
-    private static extern int GetRandom();
-    public Transform TransformGoal;
+	public Transform TransformGoal;
 	public Transform TransformAim;
 	public GameObject PrefabBall;
 
 	[Range(0, 10)]
 	public float maxVariance;
-	
+    public int frozengraphid=0;
+    public string[] frozengraphfiles = { "frozen.pb", "frozen2.pb" };
 	private float test = 1f;
 
 	private TFGraph graph;
 	private TFSession session;
 	
 	void Start ()
-	{
-        Debug.Log("test random" + GetRandom());
-        File.WriteAllText("successful_shots.csv", "");
-		TextAsset graphModel = Resources.Load ("frozen.pb") as TextAsset;
-		graph = new TFGraph ();
+	{	
+		File.WriteAllText("successful_shots.csv", "");
+
+        TextAsset graphModel;
+        if (frozengraphid==0)
+            graphModel= Resources.Load (frozengraphfiles[0]) as TextAsset;
+        else
+            graphModel = Resources.Load(frozengraphfiles[1]) as TextAsset;
+        graph = new TFGraph ();
 		graph.Import (graphModel.bytes);
 		
 		session = new TFSession (graph);
@@ -72,8 +71,8 @@ public class BallSpawnerController : MonoBehaviour
 			var closeness = Math.Min(10f, dist) / 10f;
 
             float force;
-            force = GetForceRandomly(dist);
-//            force = GetForceFromTensorFlow(dist);
+//            force = GetForceRandomly(dist);
+            force = GetForceFromTensorFlow(dist);
 
             var ball = Instantiate(PrefabBall, transform.position, Quaternion.identity);
 			var bc = ball.GetComponent<BallController>();
@@ -92,12 +91,16 @@ public class BallSpawnerController : MonoBehaviour
 	float GetForceFromTensorFlow(float distance)
 	{
 		var runner = session.GetRunner ();
+        if (frozengraphid==0)
+            runner.AddInput (
+			graph["shot_input"][0], 
+			new float[1,1]{{distance}});
+        else
+            runner.AddInput(
+            graph["hidden_input"][0],
+            new float[1, 1] { { distance } });
 
-		runner.AddInput (
-			graph["shots_input"][0], 
-			new float[1,1]{{distance}}
-		);
-		runner.Fetch (graph ["shots/BiasAdd"] [0]);
+        runner.Fetch (graph ["shots/BiasAdd"] [0]);
 		float[,] recurrent_tensor = runner.Run () [0].GetValue () as float[,];
 		var force = recurrent_tensor[0, 0] / 10;
 		Debug.Log(String.Format("{0}, {1}", distance, force));
