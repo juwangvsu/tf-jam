@@ -1,0 +1,12 @@
+import tensorflow as tf
+print(tf.__version__)
+with tf.device('/gpu:0'):
+    a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
+    b = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[3, 2], name='b')
+    c = tf.matmul(a, b)
+if tf.__version__[0]=='1':
+	with tf.Session() as sess:
+    		print (sess.run(c))
+else:
+#tf.debugging.set_log_device_placement(True)
+	print(c)
