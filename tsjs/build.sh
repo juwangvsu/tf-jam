@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 node index.js
-#bash tsjs_to_keras.sh
-tensorflowjs_converter     --input_format tfjs_layers_model --output_format keras ./model_as_tsjs/model.json ./model_as_keras/model.h5
+bash tsjs_to_keras.sh
+#tensorflowjs_converter     --input_format tfjs_layers_model --output_format keras ./model_as_tsjs/model.json ./model_as_keras/model.h5
 
 python3 keras_to_pb.py
 cp frozen2.pb.bytes ../Assets/Resources/frozen2.pb.bytes

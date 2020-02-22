@@ -20,15 +20,16 @@ To share volumn with -v, must select c: for file share in Docker Desktop
 The container Dockfile must expose port (such as 8080) to allow mapping.
 
 Test step 
-docker run -it -p "8080:8080" -p “3000:6006” -v "c:\users\ju wang\documents\tf-jam:/app" jwang3vsu/tensorflow:tf2-keras-nodejs-tfjs bash
+	docker run -it -p "8080:8080" -p “3000:6006” -v "c:\users\ju wang\documents\tf-jam:/app" jwang3vsu/tensorflow:tf2-keras-nodejs-tfjs bash
 for http server:
-Cd /app/tsjs/http; source ~/.profile; 
-node app.js
-At host browser, localhost:8080, should see “hello world”
+	cd /app/tsjs/http; source ~/.profile; 
+	node app.js
+	At host browser, localhost:8080, should see “hello world”
 for tensorboard:
-Cd /app/tsjs
-Tensorboard --bind_all --logdir log3
-At host browser, localhost:3000
+	cd /app/tsjs
+	./build.sh
+	tensorboard --bind_all --logdir log3
+	At host browser, localhost:3000
 
 ---------------2/20/2020 expose port -p tensorboard --bind_all ---------------------
 when access a container port, some tricky parts:
