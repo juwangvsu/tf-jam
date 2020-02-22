@@ -27,6 +27,7 @@ for http server:
 	At host browser, localhost:8080, should see “hello world”
 for tensorboard:
 	cd /app/tsjs
+	if win10, delete node_modules, and npm install if needed.
 	./build.sh
 	tensorboard --bind_all --logdir log3
 	At host browser, localhost:3000
