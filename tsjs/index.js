@@ -18,7 +18,7 @@ require('@tensorflow/tfjs-node');
      */
     var model = tf.sequential();
     model.add(tf.layers.dense({units: 3,activation: 'relu', inputShape: [1], name: "hidden"}));
-    model.add(tf.layers.dense({units: 3,activation: 'relu', inputShape: [1], name: "hidden3layer"}));
+    model.add(tf.layers.dense({units: 3,activation: 'relu', inputShape: [1], name: "hidden4layer"}));
     model.add(tf.layers.dense({units: 1, name: "shots"}));
     model.compile({loss: 'meanSquaredError', optimizer: 'sgd'});
 
