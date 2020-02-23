@@ -21,7 +21,7 @@ public class BallSpawnerController : MonoBehaviour
 
 	[Range(0, 10)]
 	public float maxVariance;
-    public int frozengraphid=0;
+    public int frozengraphid=1;
     public string[] frozengraphfiles = { "frozen.pb", "frozen2.pb" };
 	private float test = 1f;
 
@@ -33,10 +33,19 @@ public class BallSpawnerController : MonoBehaviour
 		File.WriteAllText("successful_shots.csv", "");
 
         TextAsset graphModel;
-        if (frozengraphid==0)
-            graphModel= Resources.Load (frozengraphfiles[0]) as TextAsset;
+        frozengraphid = 0;
+        if (frozengraphid == 0)
+        {
+            Debug.Log("frozengraphid=0");
+            graphModel = Resources.Load(frozengraphfiles[0]) as TextAsset;
+        }
         else
+        {
+            Debug.Log("frozengraphid=1");
             graphModel = Resources.Load(frozengraphfiles[1]) as TextAsset;
+
+        }
+        
         graph = new TFGraph ();
 		graph.Import (graphModel.bytes);
 		
@@ -71,8 +80,9 @@ public class BallSpawnerController : MonoBehaviour
 			var closeness = Math.Min(10f, dist) / 10f;
 
             float force;
-//            force = GetForceRandomly(dist);
-            force = GetForceFromTensorFlow(dist);
+            //force = GetForceRandomly(dist);
+            //force = GetForceFromTensorFlow(dist);
+            force = GetForceFromMagicFormula(dist);
 
             var ball = Instantiate(PrefabBall, transform.position, Quaternion.identity);
 			var bc = ball.GetComponent<BallController>();
@@ -82,8 +92,8 @@ public class BallSpawnerController : MonoBehaviour
 				dir.y * arch * closeness
 			);
 			bc.Distance = dist;
-			
-			yield return new WaitForSeconds(0.02f);
+            Debug.Log("dist: " + dist + "force " + bc.Force);
+            yield return new WaitForSeconds(20.05f);
 			 MoveToRandomDistance();
 		}
 	}
@@ -91,15 +101,22 @@ public class BallSpawnerController : MonoBehaviour
 	float GetForceFromTensorFlow(float distance)
 	{
 		var runner = session.GetRunner ();
-        if (frozengraphid==0)
-            runner.AddInput (
-			graph["shot_input"][0], 
-			new float[1,1]{{distance}});
-        else
+        Debug.Log("getforcefromtf: " + runner);
+        if (frozengraphid == 0)
+        {
+            Debug.Log("frozengraphid=0 addinput shot_input");
             runner.AddInput(
-            graph["hidden_input"][0],
+            graph["shots_input"][0],
             new float[1, 1] { { distance } });
+        }
+        else {
+            Debug.Log("frozengraphid=1 addinput hidden_input");
 
+
+            runner.AddInput(
+                graph["hidden_input"][0],
+                new float[1, 1] { { distance } });
+        }
         runner.Fetch (graph ["shots/BiasAdd"] [0]);
 		float[,] recurrent_tensor = runner.Run () [0].GetValue () as float[,];
 		var force = recurrent_tensor[0, 0] / 10;

@@ -1,6 +1,17 @@
 Video:
 tensorflowjs frozen graph keras tf-jam.mp4
 
+------2/23/2020 tf-jam debugging force velocity ---------------------------
+	force = (-0.5, force,0) if > 10 ft, (-0.xx, force, 0) 0.xx <0.5
+	magical formular works for mostly > 10 ft.
+	the x direction force decrease if ball close to post
+	print velocity in playercontroller.cs, which is is script for the prefab Ball
+	object.
+	because the way Force is assigned, the succ shot is more consistent for dist > 10 ft
+TBD:	close range shot are bad. seek for remification.
+		
+	despawn to destroy an object, yield to wait, velocity vi RigidBody rb.velocity
+
 ------2/22/2020 git automatically change unix end of line fix-------------------
 It change to windows eol crlf, unix eof is 0a, window is 0d0a, 
 Verify this using hexedit, git by default do the conversion, this

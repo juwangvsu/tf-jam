@@ -24,10 +24,23 @@ public class BallController : MonoBehaviour
 		var scaledForce = Vector3.Scale(Scaler, Force);
 		GetComponent<Rigidbody>().AddForce(scaledForce);
 		StartCoroutine(DoDespawn(30));
-		ShotCount++;
+        StartCoroutine(reportvel(0.2f));
+        ShotCount++;
 	}
+    IEnumerator reportvel(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Rigidbody rb;
+        rb =gameObject.GetComponent<Rigidbody>();
+        for (int i = 1; i < 100; i++)
+        {
+            Debug.Log("velocity:" + rb.velocity);
+            yield return new WaitForSeconds(delay);
+        }
+    }
 
-	IEnumerator DoDespawn(float delay)
+
+    IEnumerator DoDespawn(float delay)
 	{
 		yield return new WaitForSeconds(delay);
 		Destroy(gameObject);
@@ -39,7 +52,7 @@ public class BallController : MonoBehaviour
 	{
 		if (other.gameObject.name == "Court")
 		{
-			StartCoroutine(DoDespawn(2.5f));
+			StartCoroutine(DoDespawn(5.5f));
 		}
 	}
 
