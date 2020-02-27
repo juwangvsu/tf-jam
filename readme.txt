@@ -5,7 +5,7 @@ tensorflowjs frozen graph keras tf-jam.mp4
 	force = (-0.5, force,0) if > 10 ft, (-0.xx, force, 0) 0.xx <0.5
 	magical formular works for mostly > 10 ft.
 	the x direction force decrease if ball close to post
-	print velocity in playercontroller.cs, which is is script for the prefab Ball
+	print velocity in BallController.cs, which is is script for the prefab Ball
 	object.
 	because the way Force is assigned, the succ shot is more consistent for dist > 10 ft
 TBD:	close range shot are bad. seek for remification.

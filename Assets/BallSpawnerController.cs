@@ -77,23 +77,25 @@ public class BallSpawnerController : MonoBehaviour
 			var dist = (gv2 - tv2).magnitude;
 			var arch = 0.5f;
 
-			var closeness = Math.Min(10f, dist) / 10f;
+			var closeness = Math.Min(6f, dist) / 6f;
 
             float force;
-            //force = GetForceRandomly(dist);
+            force = GetForceRandomly(dist);
             //force = GetForceFromTensorFlow(dist);
-            force = GetForceFromMagicFormula(dist);
+           // force = GetForceFromMagicFormula(dist);
 
             var ball = Instantiate(PrefabBall, transform.position, Quaternion.identity);
 			var bc = ball.GetComponent<BallController>();
-			bc.Force = new Vector3(
+            Debug.Log("ballspawnercontroller calling");
+
+           bc.Force = new Vector3(
 				dir.x * arch * closeness,
 				force,//* (1f / closeness) Optional: Uncomment this to experiment with artificial shot arcs!
 				dir.y * arch * closeness
 			);
 			bc.Distance = dist;
             Debug.Log("dist: " + dist + "force " + bc.Force);
-            yield return new WaitForSeconds(20.05f);
+            yield return new WaitForSeconds(.05f);
 			 MoveToRandomDistance();
 		}
 	}

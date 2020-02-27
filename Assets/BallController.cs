@@ -75,7 +75,7 @@ public class BallController : MonoBehaviour
 	void DoReport(string info)
 	{
 		Debug.Log(info);
-		File.AppendAllText("successful_shots.csv", info += "test\n");
+		File.AppendAllText("successful_shots.csv", info += ",test\n");
         Debug.Log("got one");
 	}
 
