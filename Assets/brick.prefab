@@ -107,7 +107,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Force: {x: 0, y: 0, z: 0}
   Distance: 0
-  MaterialBallScored: {fileID: 0}
+  maxVariance: 0
+  MaterialBallScored: {fileID: 2100000, guid: 80278698e477648dc95142ddc96fa432, type: 2}
 --- !u!54 &54049227499790152
 Rigidbody:
   m_ObjectHideFlags: 0

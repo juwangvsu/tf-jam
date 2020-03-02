@@ -912,6 +912,10 @@ GameObject:
   m_Component:
   - component: {fileID: 836912124}
   - component: {fileID: 836912125}
+  - component: {fileID: 836912128}
+  - component: {fileID: 836912127}
+  - component: {fileID: 836912126}
+  - component: {fileID: 836912129}
   m_Layer: 0
   m_Name: BallSpawner
   m_TagString: Untagged
@@ -940,7 +944,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 836912123}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b1b32e5de95d144d19e31b68b0ba7510, type: 3}
   m_Name: 
@@ -953,6 +957,88 @@ MonoBehaviour:
   frozengraphfiles:
   - frozen.pb
   - frozen2.pb
+--- !u!114 &836912126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836912123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62306d6f41ba242449027010363b2488, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  maxStep: 0
+  TransformGoal: {fileID: 177880190}
+  TransformAim: {fileID: 1347095449}
+  PrefabBall: {fileID: 5074408584057389548, guid: d7141faafe14f10468699bbcf8bdf02a,
+    type: 3}
+  maxVariance: 0
+  Target: {fileID: 1210004968}
+  speed: 10
+--- !u!114 &836912127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836912123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    vectorObservationSize: 1
+    numStackedVectorObservations: 1
+    vectorActionSize: 01000000
+    vectorActionDescriptions: []
+    vectorActionSpaceType: 0
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: My Behavior
+  m_TeamID: 0
+  m_UseChildSensors: 1
+--- !u!114 &836912128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836912123}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e7b6bab15c7d2b4f9e90272d41e9db3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransformGoal: {fileID: 0}
+  TransformAim: {fileID: 0}
+  PrefabBall: {fileID: 0}
+  maxVariance: 0
+  frozengraphid: 1
+  frozengraphfiles:
+  - frozen.pb
+  - frozen2.pb
+--- !u!114 &836912129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 836912123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 20
+  RepeatAction: 1
+  offsetStep: 0
 --- !u!1 &1044671120
 GameObject:
   m_ObjectHideFlags: 0

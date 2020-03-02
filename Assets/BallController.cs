@@ -14,15 +14,15 @@ public class BallController : MonoBehaviour
 	public static int ShotCount = 1;
 
 	public Material MaterialBallScored;
-	private Vector3 Scaler = new Vector3(1000, 1000, 1000);
+    public Vector3 Scaler = new Vector3(1000, 1000, 1000);
 
-	private bool hasBeenScored = false;
+    public bool hasBeenScored = false;
 	
 	// Use this for initialization
 	void Start ()
 	{
 		var scaledForce = Vector3.Scale(Scaler, Force);
-		GetComponent<Rigidbody>().AddForce(scaledForce);
+		GetComponent<Rigidbody>().AddForce(scaledForce,ForceMode.Force);
 		StartCoroutine(DoDespawn(30));
         StartCoroutine(reportvel(0.2f));
         ShotCount++;
@@ -45,8 +45,8 @@ public class BallController : MonoBehaviour
 		yield return new WaitForSeconds(delay);
 		Destroy(gameObject);
 	}
-	
-	private bool hasTriggeredTop = false;
+
+    public bool hasTriggeredTop = false;
 
 	private void OnCollisionEnter(Collision other)
 	{

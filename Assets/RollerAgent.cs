@@ -11,6 +11,8 @@ public class RollerAgent : Agent
     public Transform TransformGoal;
     public Transform TransformAim;
     public GameObject PrefabBall;
+    [Range(0, 10)]
+    public float maxVariance;
     // Start is called before the first frame update
     void Start()
     {
@@ -60,7 +62,7 @@ public class RollerAgent : Agent
         controlSignal.x = vectorAction[0];
         controlSignal.z = vectorAction[1];
         rBody.AddForce(controlSignal * speed);
-        Debug.Log("agentaction " + vectorAction[0] + " " + vectorAction[1]);
+        //Debug.Log("agentaction " + vectorAction[0] + " " + vectorAction[1]);
         // Rewards
         float distanceToTarget = Vector3.Distance(this.transform.position,
                                                   Target.position);
@@ -101,24 +103,34 @@ public class RollerAgent : Agent
             var closeness = Math.Min(6f, dist) / 6f;
 
             float force;
-            // force = GetForceRandomly(dist);
+             force = GetForceRandomly(dist);
             //force = GetForceFromTensorFlow(dist);
             // force = GetForceFromMagicFormula(dist);
-            force = curraction[0];
+            //force = curraction[0];
             var ball = Instantiate(PrefabBall, transform.position, Quaternion.identity);
             var bc = ball.GetComponent<BrickController>();
-            Debug.Log("ballspawnercontroller_2 calling" + bc);
+            //Debug.Log("rolleragent calling" + bc);
             bc.Force = new Vector3(
                 dir.x * arch * closeness,
                 force,//* (1f / closeness) Optional: Uncomment this to experiment with artificial shot arcs!
                 dir.y * arch * closeness
             );
             bc.Distance = dist;
-            Debug.Log("dist: " + dist + "force " + bc.Force);
-            //     yield return new WaitForSeconds(.05f);
-            yield return new WaitForSeconds(1);
+            //Debug.Log("dist: " + dist + "force " + bc.Force);
+            yield return new WaitForSeconds(.05f);
+            //yield return new WaitForSeconds(1);
             MoveToRandomDistance();
         }
+    }
+
+    float GetForceRandomly(float distance)
+    {
+        return Random.Range(0f, 1f);
+    }
+    float GetForceFromMagicFormula(float distance)
+    {
+        var variance = Random.Range(1f, maxVariance);
+        return (0.125f) + (0.0317f * distance * variance);
     }
     void MoveToRandomDistance()
     {

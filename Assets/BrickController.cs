@@ -5,18 +5,18 @@ using System.IO;
 //using Boo.Lang;
 using UnityEngine;
 using UnityEngine.Assertions.Comparers;
-
-public class BrickController : MonoBehaviour
+public class BrickController : BallController
+//public class BrickController : MonoBehaviour
 {
-	public Vector3 Force;
-	public float Distance;
-	public static int SuccessCount = 0;
-	public static int ShotCount = 1;
+//	public Vector3 Force;
+//	public float Distance;
+//	public static int SuccessCount = 0;
+//	public static int ShotCount = 1;
+    
+ //   public Material MaterialBallScored;
+//	private Vector3 Scaler = new Vector3(1000, 1000, 1000);
 
-	public Material MaterialBallScored;
-	private Vector3 Scaler = new Vector3(1000, 1000, 1000);
-
-	private bool hasBeenScored = false;
+//	private bool hasBeenScored = false;
 	
 	// Use this for initialization
 	void Start ()
@@ -46,7 +46,7 @@ public class BrickController : MonoBehaviour
 		Destroy(gameObject);
 	}
 	
-	private bool hasTriggeredTop = false;
+	//private bool hasTriggeredTop = false;
 
 	private void OnCollisionEnter(Collision other)
 	{
@@ -76,7 +76,7 @@ public class BrickController : MonoBehaviour
 	{
 		Debug.Log(info);
 		File.AppendAllText("successful_shots.csv", info += ",test\n");
-        Debug.Log("got one");
+        Debug.Log("brickcontroller got one " + SuccessCount + " total cnd "+ ShotCount);
 	}
 
 	IEnumerator DoReport()
