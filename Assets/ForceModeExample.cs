@@ -47,19 +47,32 @@ public class ForceModeExample : MonoBehaviour
                  var gv2 = new Vector2(
                 TransformGoal.position.x,
                 TransformGoal.position.z);
+        var gv3 = new Vector3(
+                TransformGoal.position.x,
+                TransformGoal.position.y,TransformGoal.position.z);
 
                 var tv2 = new Vector2(
                     transform.position.x, transform.position.z);
+        var tv3 = new Vector3(
+                    transform.position.x, transform.position.y, transform.position.z);
 
                 var dir = (gv2 - tv2).normalized;
-                var dist = (gv2 - tv2).magnitude;       Debug.Log("velocity: "+ m_Rigidbody.velocity);
+                var dist = (gv2 - tv2).magnitude;
+        if (Mathf.Abs(m_Rigidbody.velocity.y) >0.00001 || Mathf.Abs(m_Rigidbody.velocity.x) > 0.00001)
+        {
+            Debug.Log(m_Rigidbody.velocity.y > 0);
+            Debug.Log(m_Rigidbody.velocity.y.ToString("F5"));
+            Debug.Log(m_Rigidbody.velocity.x > 0);
+            Debug.Log("velocity: "+ m_Rigidbody.velocity.ToString("F5") + " pos " + m_Rigidbody.transform.position.ToString("F5") );
+        }
+            
         //If the current mode is not the starting mode (or the GameObject is not reset), the force can change
         if (m_ModeSwitching != ModeSwitching.Start)
         {
             //The force changes depending what you input into the text fields
             m_NewForce = new Vector3(m_ForceX, m_ForceY, 0);
         }
-
+        MakeCustomForce();
         //Here, switching modes depend on button presses in the Game mode
         switch (m_ModeSwitching)
         {
@@ -71,13 +84,14 @@ public class ForceModeExample : MonoBehaviour
 
                 //This resets the velocity of the Rigidbody
                 m_Rigidbody.velocity = new Vector3(0f, 0f, 0f);
+                m_ModeSwitching = ModeSwitching.Idle;
                 break;
 
             //These are the modes ForceMode can force on a Rigidbody
             //This is Acceleration mode
             case ModeSwitching.Acceleration:
                 //The function converts the text fields into floats and updates the Rigidbody’s force
-                MakeCustomForce();
+                //MakeCustomForce();
                 m_NewForce = new Vector3(m_ForceX, m_ForceY, 0);
                 //Use Acceleration as the force on the Rigidbody
                 Debug.Log("apply acceleration force" + m_NewForce);
@@ -88,7 +102,7 @@ public class ForceModeExample : MonoBehaviour
             //This is Force Mode, using a continuous force on the Rigidbody considering its mass
             case ModeSwitching.Force:
                 //Converts the text fields into floats and updates the force applied to the Rigidbody
-                MakeCustomForce();
+                //MakeCustomForce();
                 m_NewForce = new Vector3(m_ForceX, m_ForceY, 0);
                 //Use Force as the force on GameObject’s Rigidbody
                 Debug.Log("apply force" + m_NewForce);
@@ -98,7 +112,7 @@ public class ForceModeExample : MonoBehaviour
             //This is Impulse Mode, which involves using the Rigidbody’s mass to apply an instant impulse force.
             case ModeSwitching.Impulse:
                 //The function converts the text fields into floats and updates the force applied to the Rigidbody
-                MakeCustomForce();
+               // MakeCustomForce();
                 m_NewForce = new Vector3(m_ForceX, m_ForceY, 0);
                 //Use Impulse as the force on GameObject
                 Debug.Log("apply impulse force" + m_NewForce);
@@ -109,18 +123,26 @@ public class ForceModeExample : MonoBehaviour
             //This is VelocityChange which involves ignoring the mass of the GameObject and impacting it with a sudden speed change in a direction
             case ModeSwitching.VelocityChange:
                 //Converts the text fields into floats and updates the force applied to the Rigidbody
-                MakeCustomForce();
+                //MakeCustomForce();
                 m_NewForce = new Vector3(m_ForceX, m_ForceY, 0);
                 //Make a Velocity change on the Rigidbody
                 m_Rigidbody.AddForce(m_NewForce, ForceMode.VelocityChange);
                 m_ModeSwitching = ModeSwitching.Idle;
                 break;
             case ModeSwitching.Velshot:
+                //dist	vx	deltay	t=dist/vx	vy=deltay+5t^2/t
+                var vx = 5;
+                var deltay = gv3.y - tv3.y;
+                Debug.Log("deltay: "+deltay +"," + "gv3.y " +  gv3.y  + ", tv3.y " + tv3.y);
+                var t = dist / vx;
+                var vy = (deltay + 5 * Mathf.Pow(t , 2)) / t;
+                Debug.Log("vs, deltay, t, vy " + vx + "," + deltay + "," + t + "," + vy);
                 Vector3 newvel = new Vector3(
-                dir.x ,
-                dist*m_ForceY,
+                vx, //m_ForceX, //dir.x ,
+                vy, //m_ForceY,  //dist*m_ForceY,dist*10/(2*dir.x)
                 dir.y
                 );
+                Debug.Log("apply velocity: " + newvel +" dist: "+ dist +" goal " + gv3 + " mypos " + tv3);
                 m_Rigidbody.AddForce(newvel, ForceMode.VelocityChange);
                 m_ModeSwitching = ModeSwitching.Idle;
                 break;
@@ -175,6 +197,11 @@ public class ForceModeExample : MonoBehaviour
             //Switch to velocity changing
             m_ModeSwitching = ModeSwitching.Velshot;
         }
+        if (GUI.Button(new Rect(100, 180, 150, 30), "Relocate"))
+        { 
+            MoveToRandomDistance();
+            GetComponent<Renderer>().material = MaterialDefault ;
+        }
     }
 
     //Changing strings to floats for the forces
@@ -190,5 +217,36 @@ public class ForceModeExample : MonoBehaviour
         //This converts the strings to floats
         m_ForceX = ConvertToFloat(m_ForceXString);
         m_ForceY = ConvertToFloat(m_ForceYString);
+    }
+    public bool hasTriggeredTop = false;
+    public bool hasBeenScored = false;
+    public static int SuccessCount = 0;
+    public static int ShotCount = 1;
+    public Material MaterialBallScored;
+    public Material MaterialDefault;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "TriggerTop")
+        {
+            Debug.Log("Top Scored... change color....");
+            hasTriggeredTop = true;
+        }
+        else if (other.name == "TriggerBottom")
+        {
+            if (hasTriggeredTop && !hasBeenScored)
+            {
+                GetComponent<Renderer>().material = MaterialBallScored;
+                Debug.Log("Bottom Scored... change color....");
+               
+            }
+            hasBeenScored = true;
+        }
+    }
+    void MoveToRandomDistance()
+    {
+        var newPosition = new Vector3(TransformGoal.position.x + Random.Range(-23f, -2.5f), transform.position.y, TransformGoal.position.z);
+        transform.position = newPosition;
+        hasBeenScored = false;
     }
 }

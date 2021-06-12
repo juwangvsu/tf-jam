@@ -1,5 +1,117 @@
 Video:
 tensorflowjs frozen graph keras tf-jam.mp4
+video: “unity ml agent test 1.mp4”
+	“unity tf-jam mlagent test 2.mp4”
+
+mlagents repo: https://github.com/Unity-Technologies/ml-agents
+	it has python package and unity package, each with different version #
+	python package is installed via pip 
+	unity package is installed via "package manager" inside unity editor software
+
+------------------------6/11/21 mlagents works after upgrade mlagents to 1.0.0 -------------
+msi: unity 2018.4
+see readme in rollerball proj
+
+RollerAgent.cs runs now, it still not doing anything useful, just move around.
+the rolleragent.cs is to replace ballspawnercontroler.cs, which use tensorflowsharp plugin.
+tensorflowsharp.dll plugin provide impl for "using TensorFlow;" in c# code
+
+---------------------------6/10/21 retest mlagents control drone (rollerball) ------------
+msi laptop
+i9lab-win
+	conda env:
+		mlagents: (python package: mlagents==0.25.1)   (unity package plugin 1.9.1), (github branch release 16)
+		mlagents-015: (python package: mlagents=0.16.0 (unity package plugin 1.0.0),(github branch release 0.15.1
+)
+	git clones: 
+		h:\mlagents    release 16
+		h:\mlagents-0.15.1    release 0.15.1
+
+
+issue: the training cmd line not work with unity game. possible due to mismatch btw python interface and unity mlagents library.
+ previous installation: the cmd line show:
+	  ml-agents: 0.14.0
+	  ml-agents-envs: 0.14.0,
+	  Communicator API: API-14
+	  TensorFlow: 2.0.1
+ new (mlagents) Version information:
+	  ml-agents: 0.25.1,
+	  ml-agents-envs: 0.25.1,
+	  Communicator API: 1.5.0,
+	  PyTorch: 1.7.1+cu110
+status:
+	rollerball finally worked again in i9labwin: conda env: mlagents-015, unity package manager mlagents version preview 1.0. change of unity package from 0.16 to 1.0.0: using MLAgents replaced by using Unity.MLAgents.
+
+-----6/10/21 re-create win10 msi environment ------------------
+3/4/20 note not working. python venv fail, possibly due to conda. now try to setup conda env
+   follow installation note: https://github.com/Unity-Technologies/ml-agents/blob/release_16_docs/docs/Installation.md
+   mlagents release 16, compatible with unity3d 2018.4, the previous install might be release 14.
+   
+  M:
+    git clone --branch release_16 https://github.com/Unity-Technologies/ml-agents.git
+
+  python env setup with conda: mlagents release 16 
+	conda create -n mlagents python=3.7
+	conda activate mlagents
+	conda install -c conda-forge implicit
+	pip3 install torch~=1.7.1 -f https://download.pytorch.org/whl/torch_stable.html
+	python -m pip install mlagents==0.25.1
+		this will also install executable shell script mlagents-learn.exe in path
+  python env activate:
+	conda activate mlagents
+
+  python env setup with conda: mlagents release 0.15.1 or 0.16 
+	in conda env mlagents-015 
+	pip install mlagents==0.16.0
+		this install tensorflow 2.5
+
+  issues:
+	F:\unityproj\tf-jam>mlagents-learn trainer_config.yaml --run-id=ball3 --train --time-scale=100
+	    error about the yaml file
+	mlagents-learn --run-id=ball3 --train --time-scale=100
+            run but time out , not able to comm with tf-jam game, check the tf-jam code to make sure the agent is enable. 
+
+  RollerAgent as of 3/4/2020:
+	it only move the player around, but not shooting the ball?
+
+---------3/4/2020 tf-jam RollerAgent training status -----------------------------------
+	training cmd works, traing logic still under studying...
+	tf-jam training no improvement, start from simple training goal similar to simplemover,
+	to understand reward scheme.
+
+----------3/4, 2/25/2020 unity3d win10 mlagent new proj training-------------------------
+Msi win10, https://github.com/Unity-Technologies/ml-agents/blob/latest_release/docs/Learning-Environment-Create-New.md
+F:\unitproj\mlagents, F:\unitproj\rollerball 
+	Pip install mlagents (this installed all dep packages, such tf2, etc)
+Mlagent 3dball ok, 
+train ok: train cmd mlagents-learn is a python script, using mlagents package, must be run from venv where mlagents and tf are installed. Unity3d software is independ to the mlagents as a python package. Unity3d editor gui runs as usual, it do not need python.
+Train steps:
+Python venv @ c:\Users\Ju Wang\Documents\python-env>sample-env\Scripts\activate
+(sample-env) F:\unityproj\tf-jam>mlagents-learn trainer_config.yaml --run-id=ball2 --train --time-scale=100
+Click play at unity3d, in terminal (2) shows training start and interact with unity3d, click stop at unity3d to terminate training.
+Results: "models\ball2\My Behavior.nn", “F:\unityproj\tf-jam\summaries\ball2_My Behavior” for tensorboard
+---Steps to create a new learning proj:
+	---See url above for detail steps.
+	--- summary: create a new unity proj, add ML-agent package through package manager, create physical agent body (e.g., a sphare), add c# script subclass Agent, add two scripts provided by ML (click agent body, add components->ML Agents-> decision requiest script. Do the same to add “Behavior Parameter” script. So this agent has three relevent scripts directely added. The behavior parameter script describe the input/output of the nn. The main agent subclass script impl observation, action execution, and reset. 
+
+-------------3/3/2020 test AddForce mode: impulse, velocity, magic formula -------------
+ball shoot is done in BrickController.cs, Start():
+	 GetComponent<Rigidbody>().AddForce(Force, ForceMode.VelocityChange);
+magic formular: vy = (deltay + 5 * Mathf.Pow(t, 2)) / t; 
+		vx=5, t = dist/vx, assume same z goal and ball
+see RollerAgent.cs
+
+------------3/2/2020 code logic -----------------------------------------
+BrickController.cs
+	attached to Ball gameobject
+RollerAgent.cs
+	Huristic called if nn model is empty, which is set in unity editor, behavior parameter component
+	attached to Player gameobject, Player instanciate a ball gameobject, set its force attribute. The ball
+	Start() start a timed invocation of Doshoot()
+	AgentAction() save action, called upon very frequently, check reward we choose to not spawn ball instance here.
+	DoShoot() wakeup every so often, spawn a new ball, set its force. new ball life start when Doshoot() yield
+BallSpawnerController_2.cs
+	attached to Player gameobject, not enable to give RollerAgent full control.
 
 ------2/23/2020 tf-jam debugging force velocity ---------------------------
 	force = (-0.5, force,0) if > 10 ft, (-0.xx, force, 0) 0.xx <0.5

@@ -8,24 +8,29 @@ using UnityEngine.Assertions.Comparers;
 public class BrickController : BallController
 //public class BrickController : MonoBehaviour
 {
-//	public Vector3 Force;
-//	public float Distance;
-//	public static int SuccessCount = 0;
-//	public static int ShotCount = 1;
-    
- //   public Material MaterialBallScored;
-//	private Vector3 Scaler = new Vector3(1000, 1000, 1000);
+    //	public Vector3 Force;
+    //	public float Distance;
+    //	public static int SuccessCount = 0;
+    //	public static int ShotCount = 1;
 
-//	private bool hasBeenScored = false;
-	
-	// Use this for initialization
+    //   public Material MaterialBallScored;
+    //	private Vector3 Scaler = new Vector3(1000, 1000, 1000);
+
+    //	private bool hasBeenScored = false;
+
+    // Use this for initialization
+    public Transform TransformPole;
+    public int ballid;
 	void Start ()
 	{
 		var scaledForce = Vector3.Scale(Scaler, Force);
-		GetComponent<Rigidbody>().AddForce(scaledForce);
-		StartCoroutine(DoDespawn(30));
+        Debug.Log("brickcontroller: scaleforce: " + scaledForce + " force: "+Force);
+        //GetComponent<Rigidbody>().AddForce(scaledForce);
+        GetComponent<Rigidbody>().AddForce(Force, ForceMode.VelocityChange);
+        StartCoroutine(DoDespawn(30));
         StartCoroutine(reportvel(0.2f));
         ShotCount++;
+        ballid = ShotCount;
 	}
     IEnumerator reportvel(float delay)
     {
@@ -50,14 +55,21 @@ public class BrickController : BallController
 
 	private void OnCollisionEnter(Collision other)
 	{
+        if (other.gameObject.name == "Backboard")
+        {
+            dist_target = (other.transform.position - transform.position).magnitude;
+            Debug.Log("hit the board: "+ dist_target);
+        }
 		if (other.gameObject.name == "Court")
 		{
-			StartCoroutine(DoDespawn(5.5f));
+            dist_target = Mathf.Abs(other.transform.position.x - transform.position.x);
+            StartCoroutine(DoDespawn(5.5f));
 		}
 	}
-
+    public float dist_target;
 	private void OnTriggerEnter(Collider other)
 	{
+
 		if (other.name == "TriggerTop")
 		{
 			hasTriggeredTop = true;
@@ -65,8 +77,8 @@ public class BrickController : BallController
 			if (hasTriggeredTop  && !hasBeenScored)
 			{
 				GetComponent<Renderer>().material = MaterialBallScored;
-                if (SuccessCount<100)
-				    DoReport(String.Format("{0}, {1}, {2}", SuccessCount++, Distance, Force.y));
+                //if (SuccessCount<100)
+				DoReport(String.Format("{0}, {1}, {2}", SuccessCount++, Distance, Force.y));
 			}
 			hasBeenScored = true;
 		}

@@ -21,10 +21,10 @@ public class PlayerController : MonoBehaviour
 			Input.GetAxis("Vertical") * Speed * Time.deltaTime
 		);
 
-		Rigidbody.MovePosition(Vector3.MoveTowards(
-			transform.position,
-			transform.position + movement,
-			Speed
-		));
+		//Rigidbody.MovePosition(Vector3.MoveTowards(
+		//	transform.position,
+		//	transform.position + movement,
+		//	Speed
+		//));
 	}
 }
